@@ -35,6 +35,10 @@ module Arel
       end
     end
 
+    def on_conflict= node
+      @ast.on_conflict = node
+    end
+
     def create_values values, columns
       Nodes::Values.new values, columns
     end

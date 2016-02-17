@@ -5,6 +5,11 @@ require 'arel/nodes/select_core'
 require 'arel/nodes/insert_statement'
 require 'arel/nodes/update_statement'
 require 'arel/nodes/bind_param'
+require 'arel/nodes/on_conflict'
+require 'arel/nodes/on_conflict_action'
+require 'arel/nodes/do_nothing'
+require 'arel/nodes/do_update_set'
+require 'arel/nodes/excluded_column'
 
 # terminal
 
