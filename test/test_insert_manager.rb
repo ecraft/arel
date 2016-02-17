@@ -196,15 +196,11 @@ module Arel
         manager = Arel::InsertManager.new
         manager.into table
 
-        on_conflict = ::Arel::Nodes::OnConflict.new
-        action = Arel::Nodes::DoUpdateSet.new
-        thing = Arel::Nodes::ExcludedColumn.new('name')
+        cm = Arel::OnConflictDoUpdateManager.new
+        cm.target = table[:id]
+        cm.set([[table[:name], Arel::Nodes::ExcludedColumn.new('name')]])
 
-        action.values = [Nodes::Assignment.new(Nodes::UnqualifiedColumn.new(table[:name]), thing)]
-        on_conflict.action = action
-        on_conflict.target = table[:id]
-
-        manager.on_conflict = on_conflict
+        manager.on_conflict = cm.to_node
 
         manager.values = Nodes::Values.new [1, 'aaron']
         manager.columns << table[:id]

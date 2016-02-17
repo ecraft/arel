@@ -18,6 +18,7 @@ require 'arel/insert_manager'
 require 'arel/select_manager'
 require 'arel/update_manager'
 require 'arel/delete_manager'
+require 'arel/on_conflict_do_update_manager'
 require 'arel/nodes'
 
 module Arel

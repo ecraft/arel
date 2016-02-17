@@ -39,6 +39,13 @@ module Arel
       @ast.on_conflict = node
     end
 
+    def do_nothing_on_conflict(target)
+      @ast.on_conflict = Nodes::OnConflict.new.tap do |on_conflict|
+        on_conflict.target = target
+        on_conflict.action = Nodes::DoNothing.new
+      end
+    end
+
     def create_values values, columns
       Nodes::Values.new values, columns
     end
