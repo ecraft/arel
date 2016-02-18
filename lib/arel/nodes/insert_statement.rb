@@ -1,7 +1,7 @@
 module Arel
   module Nodes
     class InsertStatement < Arel::Nodes::Node
-      attr_accessor :relation, :columns, :values, :select
+      attr_accessor :relation, :columns, :values, :select, :on_conflict
 
       def initialize
         super()
@@ -9,6 +9,7 @@ module Arel
         @columns  = []
         @values   = nil
         @select   = nil
+        @on_conflict = nil
       end
 
       def initialize_copy other
@@ -19,7 +20,7 @@ module Arel
       end
 
       def hash
-        [@relation, @columns, @values, @select].hash
+        [@relation, @columns, @values, @select, @on_conflict].hash
       end
 
       def eql? other
@@ -27,7 +28,8 @@ module Arel
           self.relation == other.relation &&
           self.columns == other.columns &&
           self.select == other.select &&
-          self.values == other.values
+          self.values == other.values &&
+          self.on_conflict == other.on_conflict
       end
       alias :== :eql?
     end

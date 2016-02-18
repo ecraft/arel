@@ -140,6 +140,44 @@ module Arel
         else
           collector
         end
+
+        if o.on_conflict
+          maybe_visit o.on_conflict, collector
+        else
+          collector
+        end
+      end
+
+      def visit_Arel_Nodes_OnConflict o, collector
+        collector << "ON CONFLICT "
+        collector << " (#{quote_column_name o.target.name}) "
+        maybe_visit o.action, collector
+      end
+
+      def visit_Arel_Nodes_DoNothing _o, collector
+        collector << "DO NOTHING"
+      end
+
+      def visit_Arel_Nodes_DoUpdateSet o, collector
+        wheres = o.wheres
+
+        collector << "DO UPDATE "
+        unless o.values.empty?
+          collector << " SET "
+          collector = inject_join o.values, collector, ", "
+        end
+
+        unless wheres.empty?
+          collector << " WHERE "
+          collector = inject_join wheres, collector, " AND "
+        end
+
+        collector
+      end
+
+      def visit_Arel_Nodes_ExcludedColumn o, collector
+        collector << "EXCLUDED.#{quote_column_name o.column}"
+        collector
       end
 
       def visit_Arel_Nodes_Exists o, collector
@@ -170,7 +208,7 @@ module Arel
       end
 
       def table_exists? name
-        schema_cache.table_exists? name
+        schema_cache.data_source_exists? name
       end
 
       def column_for attr
@@ -665,7 +703,7 @@ module Arel
 
       def visit_Arel_Nodes_Assignment o, collector
         case o.right
-        when Arel::Nodes::UnqualifiedColumn, Arel::Attributes::Attribute, Arel::Nodes::BindParam
+        when Arel::Nodes::UnqualifiedColumn, Arel::Attributes::Attribute, Arel::Nodes::BindParam, Arel::Nodes::ExcludedColumn
           collector = visit o.left, collector
           collector << " = "
           visit o.right, collector

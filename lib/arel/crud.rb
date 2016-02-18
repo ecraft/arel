@@ -29,6 +29,10 @@ module Arel
       InsertManager.new
     end
 
+    def create_on_conflict_do_update
+      OnConflictDoUpdateManager.new
+    end
+
     def compile_delete
       dm = DeleteManager.new
       dm.take @ast.limit.expr if @ast.limit

@@ -167,5 +167,49 @@ module Arel
 
     end
 
+    describe "on_conflict" do
+      it "accepts do nothing strategy" do
+        table = Table.new :users
+
+        manager = Arel::InsertManager.new
+        manager.into table
+
+        on_conflict = ::Arel::Nodes::OnConflict.new
+        on_conflict.action = Arel::Nodes::DoNothing.new
+        on_conflict.target = table[:id]
+
+        manager.on_conflict = on_conflict
+
+        manager.values = Nodes::Values.new [1, 'aaron']
+        manager.columns << table[:id]
+        manager.columns << table[:name]
+
+        manager.to_sql.must_be_like %{
+          INSERT INTO "users" ("id", "name") VALUES (1, 'aaron') ON CONFLICT ("id") DO NOTHING
+        }
+      end
+
+
+      it "accepts do update strategy" do
+        table = Table.new :users
+
+        manager = Arel::InsertManager.new
+        manager.into table
+
+        cm = Arel::OnConflictDoUpdateManager.new
+        cm.target = table[:id]
+        cm.set([[table[:name], Arel::Nodes::ExcludedColumn.new('name')]])
+
+        manager.on_conflict = cm.to_node
+
+        manager.values = Nodes::Values.new [1, 'aaron']
+        manager.columns << table[:id]
+        manager.columns << table[:name]
+
+        manager.to_sql.must_be_like %{
+          INSERT INTO "users" ("id", "name") VALUES (1, 'aaron') ON CONFLICT ("id") DO UPDATE SET "name" = EXCLUDED."name"
+        }
+      end
+    end
   end
 end
