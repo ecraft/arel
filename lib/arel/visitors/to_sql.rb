@@ -208,7 +208,7 @@ module Arel
       end
 
       def table_exists? name
-        schema_cache.table_exists? name
+        schema_cache.data_source_exists? name
       end
 
       def column_for attr
